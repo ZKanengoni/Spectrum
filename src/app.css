@@ -6,3 +6,12 @@
 	--main-blue: #bcd7ea;
 	--card-border: #2d2d2d;
 }
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+* {
+	font-family: 'Roboto', sans-serif;
+}

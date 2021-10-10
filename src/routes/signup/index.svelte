@@ -1,20 +1,20 @@
 <script>
+	// your script goes here
 </script>
 
-<div class="login__container">
+<div class="signup__container">
 	<div class="logo__section">
 		<img src="../static/img/rainbow.png" alt="Spectrum logo" />
 	</div>
-
 	<div class="input__container">
+		<input type="text" placeholder="Full Name" />
+		<input type="text" placeholder="Email" />
 		<input type="text" placeholder="Username" />
 		<input type="password" placeholder="Password" />
 
-		<button>Sign In</button>
+		<button>Sign up</button>
 
-		<p>Forgot password?</p>
-
-		<p id="signup">Don't have an account? <a href="/signup"><span>Register</span></a></p>
+		<p id="signup">Already have an account? <a href="/"><span>Login</span></a></p>
 	</div>
 </div>
 
@@ -28,8 +28,7 @@
 		font-family: inherit;
 		font-size: inherit;
 	}
-
-	.login__container {
+	.signup__container {
 		width: 100vw;
 		height: 100vh;
 		background-color: var(--main-bg);
@@ -86,7 +85,7 @@
 	}
 
 	#signup {
-		margin: 9rem 0 0 0;
+		margin: 1rem 0 0 0;
 		cursor: pointer;
 	}
 </style>
