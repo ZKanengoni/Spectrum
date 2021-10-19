@@ -1,6 +1,34 @@
 <script>
-	// your script goes here
+	import { onMount } from 'svelte';
+	import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+	import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+	import { initializeApp, getApps } from 'firebase/app';
+
+	let email = '';
+	let password = '';
+	let alertMessage = '';
+	let signinUp = false;
+	$: messages = false;
+	$: data = {};
+
+	onMount(async () => {
+		// const firebaseConfig = {
+		// 	apiKey: 'AIzaSyAEaCS39nM5oj1Ha2QNjbF1wDCQsPLrw-g',
+		// 	authDomain: 'spectrum-85e53.firebaseapp.com',
+		// 	projectId: 'spectrum-85e53',
+		// 	storageBucket: 'spectrum-85e53.appspot.com',
+		// 	messagingSenderId: '370298292177',
+		// 	appId: '1:370298292177:web:72febee46a30e903cc02f0',
+		// 	measurementId: 'G-TX1C83D7QT'
+		// };
+		// if (getApps().length === 0) initializeApp(firebaseConfig);
+		// const db = getFirestore();
+	});
 </script>
+
+<svelte:head>
+	<title>Sign up - Spectrum</title>
+</svelte:head>
 
 <div class="signup__container">
 	<div class="logo__section">
@@ -69,7 +97,8 @@
 		width: 78%;
 		padding: 15px;
 		margin: 40px auto;
-		background-color: #ba87ee;
+		/* background-color: rgba(186, 135, 238, 0.842); */
+		background-color: var(--main-blue);
 		color: #fff;
 		border: none;
 		border-radius: 24px;
@@ -81,7 +110,7 @@
 	}
 
 	.input__container p span {
-		color: #ba87ee;
+		color: var(--main-blue);
 	}
 
 	#signup {
