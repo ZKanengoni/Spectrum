@@ -3,6 +3,14 @@
 	import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 	import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 	import { initializeApp, getApps } from 'firebase/app';
+	import { user } from '$lib/stores';
+
+	let newUser = {
+		fullName: '',
+		email: '',
+		username: '',
+		photoUrl: false
+	};
 
 	let email = '';
 	let password = '';
@@ -11,18 +19,61 @@
 	$: messages = false;
 	$: data = {};
 
+	async function createUser() {
+		try {
+			signinUp = true;
+			const auth = getAuth();
+			const db = getFirestore();
+
+			console.log(db);
+			const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
+			$user = {
+				email: userCredentials.user.email,
+				...newUser
+			};
+			window.localStorage.setItem('user', JSON.stringify($user));
+			const docRef = await setDoc(doc(db, 'users', userCredentials.user.uid), $user);
+			signinUp = false;
+		} catch (error) {
+			signinUp = false;
+			const errorCode = error.code;
+			alertMessage = errorCode;
+			showMessage();
+		}
+	}
+
+	function showMessage() {
+		messages = true;
+
+		setTimeout(() => {
+			messages = false;
+		}, 4000);
+	}
+
 	onMount(async () => {
-		// const firebaseConfig = {
-		// 	apiKey: 'AIzaSyAEaCS39nM5oj1Ha2QNjbF1wDCQsPLrw-g',
-		// 	authDomain: 'spectrum-85e53.firebaseapp.com',
-		// 	projectId: 'spectrum-85e53',
-		// 	storageBucket: 'spectrum-85e53.appspot.com',
-		// 	messagingSenderId: '370298292177',
-		// 	appId: '1:370298292177:web:72febee46a30e903cc02f0',
-		// 	measurementId: 'G-TX1C83D7QT'
-		// };
-		// if (getApps().length === 0) initializeApp(firebaseConfig);
-		// const db = getFirestore();
+		const firebaseConfig = {
+			apiKey: 'AIzaSyAEaCS39nM5oj1Ha2QNjbF1wDCQsPLrw-g',
+			authDomain: 'spectrum-85e53.firebaseapp.com',
+			databaseURL: 'https://spectrum-85e53-default-rtdb.europe-west1.firebasedatabase.app',
+			projectId: 'spectrum-85e53',
+			storageBucket: 'spectrum-85e53.appspot.com',
+			messagingSenderId: '370298292177',
+			appId: '1:370298292177:web:1cf840d94e03ee1ecc02f0',
+			measurementId: 'G-8Y07CL3MET'
+		};
+		if (getApps().length === 0) initializeApp(firebaseConfig);
+
+		const db = getFirestore();
+		const docRef = doc(db, 'app', 'spectrum-85e53');
+		const docSnap = await getDoc(docRef);
+
+		console.log(docSnap);
+
+		if (docSnap.exists()) {
+			data = docSnap.data();
+		} else {
+			console.log(`Document does not exist.`);
+		}
 	});
 </script>
 
@@ -34,16 +85,22 @@
 	<div class="logo__section">
 		<img src="../static/img/rainbow.png" alt="Spectrum logo" />
 	</div>
-	<div class="input__container">
-		<input type="text" placeholder="Full Name" />
-		<input type="text" placeholder="Email" />
-		<input type="text" placeholder="Username" />
-		<input type="password" placeholder="Password" />
+	<form
+		on:submit={(e) => {
+			e.preventDefault();
+			createUser();
+		}}
+		class="input__container"
+	>
+		<input type="text" placeholder="Full Name" bind:value={newUser.fullName} required />
+		<input type="text" placeholder="Email" bind:value={email} required />
+		<input type="text" placeholder="Username" bind:value={newUser.username} required />
+		<input type="password" placeholder="Password" bind:value={password} required />
 
-		<button>Sign up</button>
+		<button>{signinUp ? 'Signing up...' : 'Sign up'}</button>
 
 		<p id="signup">Already have an account? <a href="/"><span>Login</span></a></p>
-	</div>
+	</form>
 </div>
 
 <style>

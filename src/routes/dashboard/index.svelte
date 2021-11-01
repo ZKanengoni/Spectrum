@@ -1,6 +1,16 @@
 <script>
 	// your script goes here
 	import Card from '$lib/blocks/Card.svelte';
+	import { user } from '$lib/stores';
+	import { onMount } from 'svelte';
+
+	$: userInfo = {};
+	$: names = [];
+
+	onMount(() => {
+		userInfo = JSON.parse(window.localStorage.getItem('user'));
+		names = userInfo.fullName.split(' ');
+	});
 </script>
 
 <svelte:head>
@@ -10,15 +20,24 @@
 <div class="dash__container">
 	<div class="text__container">
 		<p><span>Good</span> morning</p>
-		<span>John <span>Doe</span></span>
+		<span>{names[0]}<span>{names[1]}</span></span>
 	</div>
 
-	<Card title="Quiz attack" tilt="0" />
+	<Card
+		title="Learning"
+		heading="Expression check"
+		info="Copy the exprssions given to you."
+		tilt="1"
+	/>
 
-	<!-- <div class="string" />
-	<div class="string" /> -->
-
-	<Card title="Express check" colour="--main-red" top="true" tilt="0" />
+	<Card
+		title="Learning"
+		heading="Quiz attack"
+		info="Idetify the expressions shown."
+		colour="--main-red"
+		top="true"
+		tilt="-1"
+	/>
 </div>
 
 <style>

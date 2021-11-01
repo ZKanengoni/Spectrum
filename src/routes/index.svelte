@@ -1,6 +1,6 @@
 <script>
-	import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 	import { initializeApp, getApps } from 'firebase/app';
+	import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 	let email = '';
 	let password = '';
@@ -11,15 +11,15 @@
 	async function loginUser() {
 		try {
 			logingIn = true;
-
 			const firebaseConfig = {
 				apiKey: 'AIzaSyAEaCS39nM5oj1Ha2QNjbF1wDCQsPLrw-g',
 				authDomain: 'spectrum-85e53.firebaseapp.com',
+				databaseURL: 'https://spectrum-85e53-default-rtdb.europe-west1.firebasedatabase.app',
 				projectId: 'spectrum-85e53',
 				storageBucket: 'spectrum-85e53.appspot.com',
 				messagingSenderId: '370298292177',
-				appId: '1:370298292177:web:72febee46a30e903cc02f0',
-				measurementId: 'G-TX1C83D7QT'
+				appId: '1:370298292177:web:1cf840d94e03ee1ecc02f0',
+				measurementId: 'G-8Y07CL3MET'
 			};
 
 			if (getApps().length === 0) initializeApp(firebaseConfig);
@@ -33,6 +33,7 @@
 			const errorCode = error.code;
 			const errorMessage = error.message;
 			errorMessages = errorCode;
+			console.log(errorMessages);
 			showError();
 		}
 
@@ -41,7 +42,7 @@
 
 			setTimeout(() => {
 				error = false;
-			}, 5000);
+			}, 4000);
 		}
 	}
 </script>
@@ -66,7 +67,7 @@
 			loginUser();
 		}}
 	>
-		<input type="text" bind:value={email} placeholder="Username" required />
+		<input type="text" bind:value={email} placeholder="Email" required />
 		<input type="password" bind:value={password} placeholder="Password" required />
 
 		<button type="submit">

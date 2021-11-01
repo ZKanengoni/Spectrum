@@ -1,35 +1,34 @@
 <script>
-	import * as faceapi from 'face-api.js';
 	import { onMount } from 'svelte';
-	import Timer from 'easytimer.js'
-	
+	import { goto } from '$app/navigation';
+	import { isLoading, expressionItems } from '$lib/stores';
+	import Timer from 'easytimer.js';
+	import * as faceapi from 'face-api.js';
 
 	$: video = {};
 	$: btnTry = {};
 	$: outputLabel = {};
-	$: progressBar = {}
+	$: progressBar = {};
+	$: error = false;
 
-	let expressionResults = []
-	let expressionItems = []
-	let questionNumber = 0
-	let loading = false
+	let expressionResults = [];
+	let questionNumber = 1;
+	let errorMessages = '';
 
-
-	const timer = new Timer()
+	const timer = new Timer();
 
 	const MODEL_URL = 'models';
-	const emotions = ['angry', 'disgusted', 'happy', 'neutral', 'sad', 'surprised', 'fearful'];
+	const emotions = ['angry', 'disgusted', 'happy', 'neutral', 'sad', 'surprised'];
 
-	let randomEmotion = emotions[Math.floor(Math.random() * 7)];
-
+	let randomEmotion = emotions[Math.floor(Math.random() * 5)];
 
 	onMount(() => {
 		video = document.getElementById('video');
 		btnTry = document.querySelector('.try');
 		outputLabel = document.querySelector('.results');
-		progressBar = document.querySelector('.progress')
+		progressBar = document.querySelector('.progress');
 
-		console.log(randomEmotion)
+		console.log(randomEmotion);
 
 		const loadModels = async () => {
 			Promise.all([
@@ -44,36 +43,33 @@
 		loadModels();
 
 		const getDetection = () => {
-
-			expressionResults = []
+			expressionResults = [];
 
 			timer.start({
 				countdown: true,
 				startValues: {
 					seconds: 5
 				}
-			})
+			});
 
 			timer.addEventListener('secondsUpdated', (e) => {
-				outputLabel.innerText = timer.getTimeValues()
-			})
+				outputLabel.innerText = timer.getTimeValues();
+			});
 
 			timer.addEventListener('targetAchieved', async () => {
-				outputLabel.innerText = 'Imitate!'
+				outputLabel.innerText = 'Analyzing...';
 
 				const detection = await faceapi
 					.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
 					.withFaceExpressions();
 
 				if (detection.length > 0) {
-					expressionResults[0] = detection[0].expressions
+					expressionResults[0] = detection[0].expressions;
 
-					console.log(expressionResults)
-					checkAnswer(detection[0].expressions)
+					console.log(expressionResults);
+					checkAnswer(detection[0].expressions);
 				}
-
-			})
-			
+			});
 		};
 
 		btnTry.addEventListener('click', getDetection);
@@ -89,39 +85,59 @@
 	}
 
 	function checkAnswer(detections) {
-		loading = true;
+		outputLabel.innerText = '';
 
-		if(detections[randomEmotion] > 0.70) {
-			// outputLabel.innerText = 'Well done!!'
-			// nextQuestion()
-			console.log('true')
+		if (detections[randomEmotion] >= 0.5) {
+			errorMessages = 'Well done!';
+			nextQuestion();
 		} else {
-			// outputLabel.innerText = `Let's try again!`
-			console.log('Fail')
+			errorMessages = 'Sorry, try again.';
+			showError();
 		}
-
-		expressionItems = [...expressionItems, randomEmotion]
-
-		loading = false;
 	}
 
 	function nextQuestion() {
-		if(questionNumber < 6) {
+		if (questionNumber < 6) {
+			$expressionItems = [...$expressionItems, randomEmotion];
+
 			randomEmotion = emotions[Math.floor(Math.random() * 7)];
-			++questionNumber;
-			outputLabel.innerText = '';
 			progressBar.style.width = `${(questionNumber / 5) * 100}%`;
 
-			console.log(randomEmotion)
+			++questionNumber;
+
+			showError();
+
+			if (expressionResults.length == 5) goto('/games');
 		}
+	}
+
+	function showError() {
+		error = true;
+
+		setTimeout(() => {
+			error = false;
+			errorMessages = '';
+		}, 4000);
 	}
 </script>
 
 <div class="nav__container">
-	<div class="btn-back">
-		<!-- <i class="fi fi-rr-arrow-small-left"></i>	 -->
+	<div
+		class="btn-back"
+		on:click={() => {
+			location.href = '/games';
+		}}
+	>
+		<i class="fi fi-rr-arrow-small-left" />
 	</div>
-	<p>Expression Match</p>
+
+	<div class="alert" class:isVisible={error}>
+		<p>{errorMessages}</p>
+	</div>
+</div>
+
+<div class="heading">
+	<p>Match the expressions</p>
 </div>
 
 <div class="card__container">
@@ -144,6 +160,10 @@
 			<div class="progress" />
 		</div>
 	</div>
+
+	<div class="question__section">
+		<p>{randomEmotion}</p>
+	</div>
 </div>
 
 <style>
@@ -156,22 +176,24 @@
 	}
 
 	.nav__container p {
-		font-size: 19px;
+		font-size: 21.5px;
 		margin-left: 0.9rem;
+		margin-top: 0.8rem;
 	}
 
 	.question__container {
-		width: 85%;
-		height: 16.5rem;
+		width: 80%;
+		height: 6.5rem;
+		display: flex;
+		flex-direction: column;
 		background-color: #fff;
 		border-radius: 25px;
 		border: 2px solid var(--card-border);
 		margin: 2rem auto;
 	}
-	
 
 	.card__container {
-		width: 85%;
+		width: 80%;
 		height: 22rem;
 		background-color: #fff;
 		border-radius: 25px;
@@ -248,15 +270,17 @@
 	.btn-back {
 		width: 40.5px;
 		height: 40.5px;
-		background-color: var(--main-red);
-		margin: 0 2rem 2rem;
+		margin: 0 2.5rem 2rem;
+		margin-right: 0;
 		border-radius: 10px;
 		border: 2px solid var(--card-border);
 		text-align: center;
+		cursor: pointer;
 	}
 
 	.btn-back i {
 		font-size: 40px;
+		color: var(--card-border);
 	}
 
 	.progress__container {
@@ -267,8 +291,9 @@
 	}
 
 	.progress-bar {
-		width: 80%;
-		height: 1.85rem;
+		width: 60%;
+		height: 1rem;
+		/* background-color: rgba(211, 211, 211, 0.37); */
 		border: 2px solid var(--card-border);
 		border-radius: 20px;
 		margin: 1.5rem;
@@ -282,5 +307,58 @@
 		transition: width 2s ease-in-out;
 	}
 
-</style>
+	.question__section {
+		width: 80%;
+		height: 8.5rem;
+		margin: 5px auto;
+		text-align: center;
+		background-color: var(--main-purple);
+		border-radius: 18px;
+		border: 2px solid var(--card-border);
+	}
 
+	.question__section p {
+		font-size: 20px;
+	}
+
+	.alert {
+		width: 7rem !important;
+		height: 1.7rem;
+		text-align: center;
+		padding: 0.5rem;
+		background-color: var(--main-blue);
+		border: 2px solid var(--card-border);
+		border-radius: 5px;
+		opacity: 0;
+		margin: 0 3rem;
+	}
+
+	.isVisible {
+		opacity: 1;
+	}
+
+	.alert p {
+		margin: 3px 0;
+		color: var(--card-border);
+		font-size: 18px;
+	}
+
+	.alert {
+		width: 80%;
+		text-align: center;
+	}
+
+	.alert p {
+		font-size: 16px;
+	}
+
+	.heading {
+		width: 100%;
+		text-align: center;
+	}
+
+	.heading p {
+		font-size: 21px;
+		margin: 2rem 0;
+	}
+</style>

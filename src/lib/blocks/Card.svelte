@@ -8,9 +8,11 @@
 	export let colour = '--main-orange';
 	export let top = false;
 	export let tilt = '0';
+	export let mouse = 'default';
+	export let fun;
 </script>
 
-<div class="card__container" style="transform: rotate({tilt}deg);">
+<div class="card__container" style="transform: rotate({tilt}deg); cursor: {mouse}" on:click={fun}>
 	<div class="upper__card" style="background-color: var({colour});">
 		<!-- {#if top}
 			<div class="circles">
