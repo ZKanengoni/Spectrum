@@ -20,7 +20,7 @@ Spectrum is a web application built using:
 
 - git clone https://github.com/ZKanengoni/Spectrum.git
 
-2. Then open with your code editpr and run npm install && npm run dev
+2. Then open with your code editor and run npm install && npm run dev
 
 3. Open your browser in localhost and change the view to a mobile view
 
