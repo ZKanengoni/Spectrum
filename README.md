@@ -27,6 +27,6 @@ Spectrum is a web application built using:
 
 ## Contact
 
-Zivaiishe Kanengoni - 190187@virtualwindow.co.Zivaiishe
+Zivaiishe Kanengoni - 190187@virtualwindow.co.za
 
 Project Link: https://github.com/ZKanengoni/Spectrum
